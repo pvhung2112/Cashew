@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -18,7 +19,8 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="google-signin-client_id" content="267621253497-1na8q1lt56qg9177dskkrkdds5jjiqrn.apps.googleusercontent.com">
+  <meta name="google-signin-client_id"
+    content="267621253497-1na8q1lt56qg9177dskkrkdds5jjiqrn.apps.googleusercontent.com">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,11 +29,11 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/pg" href="favicon/png"/>
-  <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  <link rel="icon" type="image/pg" href="favicon/png" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FFFFFF">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#000000">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
 
   <title>Cashew</title>
   <link rel="manifest" href="manifest.json">
@@ -58,6 +60,7 @@
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
+
 <body oncontextmenu="return false;">
   <style>
     @media (prefers-color-scheme: dark) {
@@ -74,7 +77,7 @@
 
     // TODO: Add SDKs for Firebase products that you want to use
     // https://firebase.google.com/docs/web/setup#available-libraries
-  
+
     // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBGiaRl72d4k3Ki0dh8ra-gU4v2z04CgIw",
@@ -84,7 +87,7 @@
       messagingSenderId: "267621253497",
       appId: "1:267621253497:web:12558fe9abebf7fa842fa8"
     };
-  
+
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
   </script>
@@ -107,7 +110,8 @@
         width: 100%;
       }
 
-      #loading .loading-spinner, #loading .loading-icon {
+      #loading .loading-spinner,
+      #loading .loading-icon {
         transition: opacity 0.5s;
       }
 
@@ -115,7 +119,8 @@
         opacity: 0;
       }
 
-      #loading.init_done .loading-spinner, #loading.init_done .loading-icon {
+      #loading.init_done .loading-spinner,
+      #loading.init_done .loading-icon {
         /* animation: .33s ease-in-out 0s 1 forwards zoom; */
         opacity: 0;
       }
@@ -125,20 +130,20 @@
         display: inline-block;
         width: 45px;
         height: 45px;
-        border: 4px solid rgba(255,255,255,.3);
+        border: 4px solid rgba(255, 255, 255, .3);
         border-radius: 50%;
         border-top-color: #e3e7ff;
         animation: spin 1s linear infinite;
         opacity: .66;
       }
 
-      .column{
+      .column {
         display: flex;
         flex-direction: column;
         align-items: center;
       }
 
-      .loading-icon{
+      .loading-icon {
         margin: 40px 10px;
         width: min(30vh, 30vw);
         height: min(30vh, 30vw);
@@ -148,30 +153,31 @@
         0% {
           transform: rotate(0deg);
         }
+
         100% {
           transform: rotate(360deg);
         }
       }
     </style>
     <div class="column">
-      <img src="./icons/Icon.png" class="loading-icon"/>
+      <img src="./icons/Icon.png" class="loading-icon" />
       <div class="loading-spinner"></div>
     </div>
   </div>
   <script>
-    window.addEventListener('load', function(ev) {
+    window.addEventListener('load', function (ev) {
       var loading = document.querySelector('#loading');
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         }
-      }).then(function(engineInitializer) {
+      }).then(function (engineInitializer) {
         loading.classList.add('main_done');
         return engineInitializer.initializeEngine({
           useColorEmoji: true,
         });
-      }).then(function(appRunner) {
+      }).then(function (appRunner) {
         loading.classList.add('init_done');
         return appRunner.runApp();
       }).then(function (_) {
@@ -182,7 +188,7 @@
         }, 200);
 
         // https://github.com/flutter/flutter/issues/55913#issuecomment-1248816491
-        
+
         const flutterRoot = document.getElementsByTagName('flt-glass-pane').item(0);
         flutterRoot.addEventListener('touchstart', (e) => {
           // is not near edge of view, exit
@@ -194,4 +200,5 @@
     });
   </script>
 </body>
+
 </html>

@@ -637,7 +637,7 @@ class NavigationSidebarButton extends StatelessWidget {
           key: ValueKey(isSelected),
           borderRadius: getPlatform() == PlatformOS.isIOS ? 10 : 50,
           color: isSelected
-              ? Theme.of(context).colorScheme.secondaryContainer
+              ? Colors.pink.shade100
               : null,
           onTap: () {
             if (popRoutes) {
