@@ -2,7 +2,7 @@
 
 <div align="center">
   <h3><b>Đề tài: Nghiên cứu và phân tích chi tiết kiến trúc kỹ thuật ứng dụng Cashew</b></h3>
-  <p><b>Sinh viên thực hiện:</b> Phạm Văn Hùng (<code>pvhung2112</code>)</p>
+  <p><b>Sinh viên thực hiện:</b> Phạm Văn Hưng (<code>pvhung2112</code>)</p>
   <p>
     <a href="https://github.com/pvhung2112/cashew"><img src="https://img.shields.io/badge/GitHub-Repository-blue?logo=github" alt="Repo"/></a>
     <a href="https://gitdiagram.com/pvhung2112/cashew"><img src="https://img.shields.io/badge/GitDiagram-Interactive%20Architecture-orange?logo=diagramsdotnet" alt="Diagram"/></a>
@@ -151,6 +151,6 @@ flutter run
 ---
 
 ## 👨‍💻 Thông tin tác giả
-- **Sinh viên:** Phạm Văn Hùng
+- **Sinh viên:** Phạm Văn Hưng
 - **GitHub:** [@pvhung2112](https://github.com/pvhung2112)
 - **Mã nguồn Repository:** [https://github.com/pvhung2112/cashew](https://github.com/pvhung2112/cashew)

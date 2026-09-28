@@ -3,7 +3,7 @@
 - **Dự án mã nguồn (GitHub):** [https://github.com/pvhung2112/cashew](https://github.com/pvhung2112/cashew)
 - **Link sơ đồ kiến trúc tương tác trực quan (GitDiagram):** [https://gitdiagram.com/pvhung2112/cashew](https://gitdiagram.com/pvhung2112/cashew)
 - **Thư mục làm việc thực tế:** `D:\ok\`
-- **Sinh viên thực hiện:** Phạm Văn Hùng (`pvhung2112`)
+- **Sinh viên thực hiện:** Phạm Văn Hưng (`pvhung2112`)
 - **Mô hình kiến trúc tổng thể:** **Local-First (Offline-First) Architecture** kết hợp **Backend-as-a-Service (BaaS)**
 
 ---
