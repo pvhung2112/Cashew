@@ -3,8 +3,6 @@ import 'package:budget/colors.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/framework/pageFramework.dart';
-import 'package:budget/widgets/navigationFramework.dart';
-import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/fab.dart';
@@ -88,7 +86,7 @@ class StudyDocumentsPageState extends State<StudyDocumentsPage>
           padding: const EdgeInsetsDirectional.all(15),
           tooltip: "Quản lý môn học",
           onPressed: () {
-            pushRoute(context, const StudyCoursesPage());
+            pushRoute(context, const CoursesPage());
           },
           icon: Icon(
             appStateSettings["outlinedIcons"]
@@ -124,11 +122,9 @@ class StudyDocumentsPageState extends State<StudyDocumentsPage>
           ),
         ),
       ],
-      floatingActionButton: AnimateFAB(
-        fab: AddFAB(
-          tooltip: "Thêm tài liệu",
-          openPage: const AddEditDocumentPage(),
-        ),
+      floatingActionButton: AddFAB(
+        tooltip: "Thêm tài liệu",
+        openPage: const AddEditDocumentPage(),
       ),
       slivers: [
         // 1. Thống kê nhanh theo phong cách Cashew Dashboard (như ảnh 1)
@@ -414,7 +410,6 @@ class StudyDocumentsPageState extends State<StudyDocumentsPage>
               padding: const EdgeInsets.only(top: 40),
               child: NoResults(
                 message: "Chưa có tài liệu nào trong danh mục này",
-                icon: Icons.menu_book_rounded,
               ),
             ),
           );

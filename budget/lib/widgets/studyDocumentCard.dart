@@ -67,8 +67,8 @@ class StudyDocumentCard extends StatelessWidget {
         !isDone;
 
     final courseDao = CourseDao();
-    final Course? course = document.courseId != null
-        ? courseDao.getById(document.courseId!)
+    final Course? course = document.courseId.isNotEmpty
+        ? courseDao.getById(document.courseId)
         : null;
 
     return Container(
@@ -83,7 +83,7 @@ class StudyDocumentCard extends StatelessWidget {
         onTap: () {
           pushRoute(
             context,
-            AddEditDocumentPage(document: document),
+            AddEditDocumentPage(initialDocument: document),
           );
         },
         child: Padding(
@@ -153,7 +153,7 @@ class StudyDocumentCard extends StatelessWidget {
                     constraints: const BoxConstraints(),
                     onSelected: (val) {
                       if (val == 'edit') {
-                        pushRoute(context, AddEditDocumentPage(document: document));
+                        pushRoute(context, AddEditDocumentPage(initialDocument: document));
                       } else if (val == 'delete' && onDelete != null) {
                         onDelete!();
                       }
@@ -288,7 +288,7 @@ class StudyDocumentCard extends StatelessWidget {
         fg = Colors.orange.shade800;
         label = "Đang học";
         break;
-      case DocumentStatus.notStarted:
+      case DocumentStatus.todo:
         bg = Colors.grey.withOpacity(0.12);
         fg = Colors.grey.shade700;
         label = "Cần học";

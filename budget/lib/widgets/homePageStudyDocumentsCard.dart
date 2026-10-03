@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/functions.dart';
-import 'package:budget/widgets/navigationFramework.dart';
+import 'package:budget/main.dart';
 import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import '../struct/studyDocument.dart';

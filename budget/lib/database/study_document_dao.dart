@@ -36,9 +36,17 @@ class DocumentDao {
   }
 
   /// Lấy toàn bộ danh sách tài liệu
-  List<StudyDocument> getAll() {
-    return _db.getAllDocuments();
+  Stream<List<StudyDocument>> watchAll({DocumentType? type, String? courseId}) {
+    return watchFiltered(type: type, courseId: courseId);
   }
+
+  List<StudyDocument> getAll({DocumentType? type, String? courseId}) {
+    if (type == null && (courseId == null || courseId.isEmpty || courseId == 'all')) {
+      return _db.getAllDocuments();
+    }
+    return filterDocuments(type: type, courseId: courseId);
+  }
+
 
   /// Tìm kiếm và lọc tài liệu đa tiêu chí (Search & Filter Logic)
   List<StudyDocument> filterDocuments({

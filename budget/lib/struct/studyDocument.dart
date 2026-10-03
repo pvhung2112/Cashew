@@ -114,7 +114,7 @@ class StudyDocument {
       tags: tags ?? this.tags,
       deadline: deadline ?? this.deadline,
       createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? DateTime.now(),
+      updatedAt: updatedAt ?? this.updatedAt,
       isPinned: isPinned ?? this.isPinned,
       isSynced: isSynced ?? this.isSynced,
     );
@@ -124,48 +124,48 @@ class StudyDocument {
     return {
       'id': id,
       'title': title,
-      'courseId': courseId,
+      'course_id': courseId,
       'type': type.name,
       'status': status.name,
       'description': description,
-      'fileUrl': fileUrl,
+      'file_url': fileUrl,
       'tags': jsonEncode(tags),
       'deadline': deadline?.toIso8601String(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'isPinned': isPinned ? 1 : 0,
-      'isSynced': isSynced ? 1 : 0,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'is_pinned': isPinned ? 1 : 0,
+      'is_synced': isSynced ? 1 : 0,
     };
   }
 
   factory StudyDocument.fromMap(Map<String, dynamic> map) {
     List<String> parsedTags = [];
     if (map['tags'] != null) {
-      if (map['tags'] is List) {
-        parsedTags = List<String>.from(map['tags']);
-      } else if (map['tags'] is String && (map['tags'] as String).isNotEmpty) {
-        try {
-          parsedTags = List<String>.from(jsonDecode(map['tags']));
-        } catch (_) {
-          parsedTags = (map['tags'] as String).split(',').map((e) => e.trim()).toList();
-        }
+      try {
+        parsedTags = List<String>.from(jsonDecode(map['tags']));
+      } catch (_) {
+        parsedTags = [];
       }
     }
 
     return StudyDocument(
-      id: map['id'] ?? '',
-      title: map['title'] ?? '',
-      courseId: map['courseId'] ?? '',
-      type: DocumentTypeExtension.fromString(map['type']),
-      status: DocumentStatusExtension.fromString(map['status']),
-      description: map['description'] ?? '',
-      fileUrl: map['fileUrl'] ?? '',
+      id: map['id'] as String,
+      title: map['title'] as String,
+      courseId: (map['course_id'] ?? map['courseId'] ?? '') as String,
+      type: DocumentTypeExtension.fromString(map['type'] as String?),
+      status: DocumentStatusExtension.fromString(map['status'] as String?),
+      description: (map['description'] ?? '') as String,
+      fileUrl: (map['file_url'] ?? map['fileUrl'] ?? '') as String,
       tags: parsedTags,
-      deadline: map['deadline'] != null ? DateTime.tryParse(map['deadline']) : null,
-      createdAt: map['createdAt'] != null ? DateTime.parse(map['createdAt']) : DateTime.now(),
-      updatedAt: map['updatedAt'] != null ? DateTime.parse(map['updatedAt']) : DateTime.now(),
-      isPinned: map['isPinned'] == 1 || map['isPinned'] == true,
-      isSynced: map['isSynced'] == 1 || map['isSynced'] == true,
+      deadline: map['deadline'] != null ? DateTime.parse(map['deadline'] as String) : null,
+      createdAt: map['created_at'] != null
+          ? DateTime.parse(map['created_at'] as String)
+          : DateTime.now(),
+      updatedAt: map['updated_at'] != null
+          ? DateTime.parse(map['updated_at'] as String)
+          : DateTime.now(),
+      isPinned: (map['is_pinned'] ?? map['isPinned'] ?? 0) == 1,
+      isSynced: (map['is_synced'] ?? map['isSynced'] ?? 0) == 1,
     );
   }
 }
