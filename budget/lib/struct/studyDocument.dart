@@ -1,10 +1,9 @@
 import 'dart:convert';
 
-/// Phân loại tài liệu học tập theo nghiệp vụ
 enum DocumentType {
-  lecture, // Bài giảng / Slide môn học
-  exercise, // Bài tập / Đồ án / Bài tập lớn
-  reference, // Tài liệu tham khảo / Sách / Giáo trình
+  lecture,
+  exercise,
+  reference,
 }
 
 extension DocumentTypeExtension on DocumentType {
@@ -30,11 +29,10 @@ extension DocumentTypeExtension on DocumentType {
   }
 }
 
-/// Trạng thái học tập của tài liệu
 enum DocumentStatus {
-  todo, // Chưa học / Cần làm
-  inProgress, // Đang học / Đang làm
-  completed, // Đã hoàn thành
+  todo,
+  inProgress,
+  completed,
 }
 
 extension DocumentStatusExtension on DocumentStatus {
@@ -58,7 +56,6 @@ extension DocumentStatusExtension on DocumentStatus {
   }
 }
 
-/// Thực thể Tài liệu học tập (Tương đương Transaction/Budget trong Cashew)
 class StudyDocument {
   final String id;
   final String title;
@@ -66,13 +63,13 @@ class StudyDocument {
   final DocumentType type;
   final DocumentStatus status;
   final String description;
-  final String fileUrl; // Đường dẫn tệp nội bộ hoặc URL tài liệu đám mây
+  final String fileUrl;
   final List<String> tags;
-  final DateTime? deadline; // Hạn nộp bài tập hoặc hạn đọc tài liệu
+  final DateTime? deadline;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isPinned;
-  final bool isSynced; // Cờ phục vụ cơ chế Sync Client Local-First giống Cashew
+  final bool isSynced;
 
   StudyDocument({
     required this.id,
@@ -172,4 +169,3 @@ class StudyDocument {
     );
   }
 }
-

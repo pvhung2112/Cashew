@@ -318,7 +318,7 @@ class NavigationSidebarState extends State<NavigationSidebar> {
                               ),
                               NavigationSidebarButton(
                                 icon: Icons.menu_book_rounded,
-                                label: "TÃ i liá»‡u há»c táº­p",
+                                label: "Tài liệu học tập",
                                 isSelected: false,
                                 onTap: () {
                                   pushRoute(context, StudyDocumentsPage());

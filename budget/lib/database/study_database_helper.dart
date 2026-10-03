@@ -5,8 +5,6 @@ import '../struct/studyCourse.dart';
 import '../struct/studyGoal.dart';
 import '../struct/studySyncClient.dart';
 
-/// Database Engine cục bộ đóng vai trò Single Source of Truth theo kiến trúc Local-First của Cashew.
-/// Cung cấp Reactive Streams (tương đương Drift .watch() trong Cashew) cho toàn bộ hệ thống UI.
 class AppDatabase {
   static final AppDatabase _instance = AppDatabase._internal();
   factory AppDatabase() => _instance;
@@ -14,12 +12,10 @@ class AppDatabase {
     _initSeedData();
   }
 
-  // Bộ nhớ lưu trữ dữ liệu cục bộ
   final Map<String, StudyDocument> _documents = {};
   final Map<String, Course> _courses = {};
   final Map<String, StudyGoal> _goals = {};
 
-  // Các Reactive Stream Controllers (Drift-like reactive streams)
   final _documentsStreamController = StreamController<List<StudyDocument>>.broadcast();
   final _coursesStreamController = StreamController<List<Course>>.broadcast();
   final _goalsStreamController = StreamController<List<StudyGoal>>.broadcast();
@@ -36,7 +32,6 @@ class AppDatabase {
       });
     _documentsStreamController.add(List.unmodifiable(docs));
 
-    // Cập nhật số lượng tài liệu chưa đồng bộ cho Sync Client
     final unsynced = docs.where((d) => !d.isSynced).length;
     SyncClient().updatePendingCount(unsynced);
   }
@@ -52,16 +47,14 @@ class AppDatabase {
     _goalsStreamController.add(List.unmodifiable(list));
   }
 
-  /// Khởi tạo dữ liệu mẫu ban đầu để kiểm thử hệ thống
   void _initSeedData() {
-    // 1. Các môn học mẫu
     final c1 = Course(
       id: 'c_ktpm',
       code: 'SE301',
       name: 'Kiến trúc Phần mềm',
       lecturer: 'TS. Nguyễn Văn A',
       credits: 3,
-      colorValue: 0xFF2A75D3, // Xanh biển
+      colorValue: 0xFF2A75D3,
       description: 'Nghiên cứu các mẫu thiết kế và kiến trúc Local-First, Clean Architecture',
     );
     final c2 = Course(
@@ -70,7 +63,7 @@ class AppDatabase {
       name: 'Phát triển Ứng dụng Di động',
       lecturer: 'ThS. Trần Thị B',
       credits: 4,
-      colorValue: 0xFF009688, // Xanh ngọc
+      colorValue: 0xFF009688,
       description: 'Lập trình ứng dụng đa nền tảng với Flutter & Dart',
     );
     final c3 = Course(
@@ -79,7 +72,7 @@ class AppDatabase {
       name: 'Cơ sở Dữ liệu Phân tán',
       lecturer: 'PGS. Lê Hoàng C',
       credits: 3,
-      colorValue: 0xFFE65100, // Cam đất
+      colorValue: 0xFFE65100,
       description: 'Lưu trữ NoSQL, SQLite và cơ chế đồng bộ đa thiết bị',
     );
 
@@ -87,7 +80,6 @@ class AppDatabase {
     _courses[c2.id] = c2;
     _courses[c3.id] = c3;
 
-    // 2. Các tài liệu học tập mẫu
     final now = DateTime.now();
     final d1 = StudyDocument(
       id: 'doc_1',
@@ -152,7 +144,6 @@ class AppDatabase {
     _documents[d3.id] = d3;
     _documents[d4.id] = d4;
 
-    // 3. Mục tiêu học tập mẫu
     final g1 = StudyGoal(
       id: 'goal_1',
       title: 'Hoàn thành toàn bộ bài tập môn Kiến trúc Phần mềm',
@@ -175,7 +166,6 @@ class AppDatabase {
     _goals[g1.id] = g1;
     _goals[g2.id] = g2;
 
-    // Khởi tạo các streams
     Timer.run(() {
       _notifyDocuments();
       _notifyCourses();
@@ -183,7 +173,6 @@ class AppDatabase {
     });
   }
 
-  // --- CRUD Documents ---
   Future<void> insertDocument(StudyDocument doc) async {
     _documents[doc.id] = doc;
     _notifyDocuments();
@@ -210,7 +199,6 @@ class AppDatabase {
     return list;
   }
 
-  // --- CRUD Courses ---
   Future<void> insertCourse(Course course) async {
     _courses[course.id] = course;
     _notifyCourses();
@@ -223,7 +211,6 @@ class AppDatabase {
 
   Future<void> deleteCourse(String id) async {
     _courses.remove(id);
-    // Xóa liên hoàn các tài liệu thuộc môn học đó (Cascade Delete)
     _documents.removeWhere((key, value) => value.courseId == id);
     _notifyCourses();
     _notifyDocuments();
@@ -232,7 +219,6 @@ class AppDatabase {
   Course? getCourse(String id) => _courses[id];
   List<Course> getAllCourses() => _courses.values.toList();
 
-  // --- CRUD Goals ---
   Future<void> insertGoal(StudyGoal goal) async {
     _goals[goal.id] = goal;
     _notifyGoals();
@@ -250,7 +236,6 @@ class AppDatabase {
 
   List<StudyGoal> getAllGoals() => _goals.values.toList();
 
-  // --- Backup & Export / Import ---
   String exportToJson() {
     final data = {
       'version': '1.0.0',
@@ -298,5 +283,3 @@ class AppDatabase {
     _initSeedData();
   }
 }
-
-

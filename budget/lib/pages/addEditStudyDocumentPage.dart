@@ -97,7 +97,7 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Nguồn: ${meta['source']} | Định dạng: .${meta['extension']} (~${meta['sizeKb']} KB)'),
+          content: Text('Nguồn: ' + meta['source'] + ' | Định dạng: .' + meta['extension'] + ' (~' + meta['sizeKb'] + ' KB)'),
           backgroundColor: Colors.teal,
         ),
       );
@@ -120,7 +120,7 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
         .toList();
 
     final isEdit = widget.initialDocument != null;
-    final docId = isEdit ? widget.initialDocument!.id : 'doc_${DateTime.now().millisecondsSinceEpoch}';
+    final docId = isEdit ? widget.initialDocument!.id : 'doc_' + DateTime.now().millisecondsSinceEpoch.toString();
 
     final document = StudyDocument(
       id: docId,
@@ -133,7 +133,7 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
       tags: tags,
       deadline: _selectedDeadline,
       isPinned: _isPinned,
-      isSynced: false, // Thay đổi mới cần đồng bộ
+      isSynced: false,
       createdAt: isEdit ? widget.initialDocument!.createdAt : DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -183,7 +183,6 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Tiêu đề
             TextFormField(
               controller: _titleController,
               decoration: const InputDecoration(
@@ -196,9 +195,8 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
             ),
             const SizedBox(height: 16),
 
-            // Chọn Môn học (Courses)
             DropdownButtonFormField<String>(
-              value: _selectedCourseId,
+              initialValue: _selectedCourseId,
               decoration: const InputDecoration(
                 labelText: 'Môn học / Học phần *',
                 prefixIcon: Icon(Icons.school_rounded),
@@ -218,7 +216,7 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text('${c.code} - ${c.name}'),
+                      Text(c.code + ' - ' + c.name),
                     ],
                   ),
                 );
@@ -227,7 +225,6 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
             ),
             const SizedBox(height: 16),
 
-            // Phân loại tài liệu (Lecture, Exercise, Reference)
             const Text(
               'Phân loại tài liệu:',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
@@ -256,7 +253,6 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
             ),
             const SizedBox(height: 16),
 
-            // Trạng thái học tập
             const Text(
               'Trạng thái học tập:',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
@@ -282,14 +278,13 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
             ),
             const SizedBox(height: 16),
 
-            // Hạn nộp / Deadline
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.event_note_rounded, color: Color(0xFF1E3C72)),
               title: Text(
                 _selectedDeadline == null
                     ? 'Chưa đặt hạn nộp / thời hạn hoàn thành'
-                    : 'Hạn: ${DateFormat('dd/MM/yyyy').format(_selectedDeadline!)}',
+                    : 'Hạn: ' + DateFormat('dd/MM/yyyy').format(_selectedDeadline!),
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
               subtitle: const Text('Nhắc nhở tự động theo kiến trúc Cashew'),
@@ -310,7 +305,6 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
             ),
             const SizedBox(height: 8),
 
-            // Đường dẫn tệp / Cloud Link
             TextFormField(
               controller: _fileUrlController,
               decoration: InputDecoration(
@@ -329,7 +323,6 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
             ),
             const SizedBox(height: 16),
 
-            // Tags
             TextFormField(
               controller: _tagsController,
               decoration: const InputDecoration(
@@ -341,7 +334,6 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
             ),
             const SizedBox(height: 16),
 
-            // Mô tả chi tiết
             TextFormField(
               controller: _descController,
               maxLines: 3,
@@ -354,7 +346,6 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
             ),
             const SizedBox(height: 24),
 
-            // Nút Lưu
             SizedBox(
               height: 48,
               child: ElevatedButton.icon(
@@ -377,4 +368,3 @@ class _AddEditDocumentPageState extends State<AddEditDocumentPage> {
     );
   }
 }
-

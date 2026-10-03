@@ -53,11 +53,11 @@ class _StudyDocumentsPageState extends State<StudyDocumentsPage> with SingleTick
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kho TÃƒÂ i liÃ¡Â»â€¡u HÃ¡Â»Âc tÃ¡ÂºÂ­p'),
+        title: const Text('Kho Tài liệu Học tập'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
-            tooltip: 'TÃƒÂ¬m kiÃ¡ÂºÂ¿m & BÃ¡Â»â„¢ lÃ¡Â»Âc',
+            tooltip: 'Tìm kiếm & Bộ lọc',
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const DocumentSearchPage()),
@@ -69,16 +69,16 @@ class _StudyDocumentsPageState extends State<StudyDocumentsPage> with SingleTick
           isScrollable: false,
           indicatorColor: Colors.white,
           tabs: const [
-            Tab(text: 'TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£'),
-            Tab(text: 'BÃƒÂ i giÃ¡ÂºÂ£ng'),
-            Tab(text: 'BÃƒÂ i tÃ¡ÂºÂ­p'),
-            Tab(text: 'Tham khÃ¡ÂºÂ£o'),
+            Tab(text: 'Tất cả'),
+            Tab(text: 'Bài giảng'),
+            Tab(text: 'Bài tập'),
+            Tab(text: 'Tham khảo'),
           ],
         ),
       ),
       body: Column(
         children: [
-          // Thanh lÃ¡Â»Âc nhanh mÃƒÂ´n hÃ¡Â»Âc dÃ¡ÂºÂ¡ng Chips
+          // Thanh lọc nhanh môn học dạng Chips
           StreamBuilder<List<Course>>(
             stream: _courseDao.watchAll(),
             initialData: _courseDao.getAll(),
@@ -92,7 +92,7 @@ class _StudyDocumentsPageState extends State<StudyDocumentsPage> with SingleTick
                 child: Row(
                   children: [
                     ChoiceChip(
-                      label: const Text('TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£ mÃƒÂ´n'),
+                      label: const Text('Tất cả môn'),
                       selected: _selectedCourseId == null,
                       onSelected: (val) => setState(() => _selectedCourseId = null),
                     ),
@@ -119,7 +119,7 @@ class _StudyDocumentsPageState extends State<StudyDocumentsPage> with SingleTick
           ),
           const Divider(height: 1),
 
-          // Danh sÃƒÂ¡ch tÃƒÂ i liÃ¡Â»â€¡u phÃ¡ÂºÂ£n hÃ¡Â»â€œi Reactive Stream
+          // Danh sách tài liệu phản hồi Reactive Stream
           Expanded(
             child: StreamBuilder<List<StudyDocument>>(
               stream: _documentDao.watchFiltered(
@@ -142,7 +142,7 @@ class _StudyDocumentsPageState extends State<StudyDocumentsPage> with SingleTick
                         Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey.shade400),
                         const SizedBox(height: 12),
                         Text(
-                          'KhÃƒÂ´ng cÃƒÂ³ tÃƒÂ i liÃ¡Â»â€¡u nÃƒÂ o trong mÃ¡Â»Â¥c nÃƒÂ y',
+                          'Không có tài liệu nào trong mục này',
                           style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                         ),
                       ],
@@ -190,9 +190,8 @@ class _StudyDocumentsPageState extends State<StudyDocumentsPage> with SingleTick
           MaterialPageRoute(builder: (_) => const AddEditDocumentPage()),
         ),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('ThÃƒÂªm tÃƒÂ i liÃ¡Â»â€¡u'),
+        label: const Text('Thêm tài liệu'),
       ),
     );
   }
 }
-

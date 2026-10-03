@@ -24,11 +24,11 @@ class DocumentCard extends StatelessWidget {
   Color _getTypeColor(DocumentType type) {
     switch (type) {
       case DocumentType.lecture:
-        return const Color(0xFF2A75D3); // Xanh dương
+        return const Color(0xFF2A75D3);
       case DocumentType.exercise:
-        return const Color(0xFFE65100); // Cam
+        return const Color(0xFFE65100);
       case DocumentType.reference:
-        return const Color(0xFF2E7D32); // Xanh lá
+        return const Color(0xFF2E7D32);
     }
   }
 
@@ -55,7 +55,7 @@ class DocumentCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
         side: document.isPinned
-            ? BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.5), width: 1.5)
+            ? BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5), width: 1.5)
             : BorderSide.none,
       ),
       child: InkWell(
@@ -66,13 +66,12 @@ class DocumentCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Hàng trên: Badge Loại tài liệu + Badge Môn học + Ghim / Menu
               Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: typeColor.withOpacity(0.12),
+                      color: typeColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -92,7 +91,7 @@ class DocumentCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: courseColor.withOpacity(0.12),
+                        color: courseColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -101,7 +100,6 @@ class DocumentCard extends StatelessWidget {
                       ),
                     ),
                   const Spacer(),
-                  // Nút ghim
                   IconButton(
                     icon: Icon(
                       document.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
@@ -112,7 +110,6 @@ class DocumentCard extends StatelessWidget {
                     visualDensity: VisualDensity.compact,
                     onPressed: onTogglePin,
                   ),
-                  // Trạng thái Sync
                   Icon(
                     document.isSynced ? Icons.cloud_done_rounded : Icons.cloud_upload_outlined,
                     size: 18,
@@ -122,7 +119,6 @@ class DocumentCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Tiêu đề tài liệu
               Text(
                 document.title,
                 style: TextStyle(
@@ -147,10 +143,8 @@ class DocumentCard extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              // Hàng dưới: Tags, Deadline, Nút đổi trạng thái
               Row(
                 children: [
-                  // Hạn nộp / deadline
                   if (document.deadline != null) ...[
                     Icon(
                       Icons.schedule_rounded,
@@ -173,7 +167,6 @@ class DocumentCard extends StatelessWidget {
                     const SizedBox(width: 12),
                   ],
 
-                  // Trạng thái học
                   InkWell(
                     onTap: onToggleStatus,
                     borderRadius: BorderRadius.circular(6),
@@ -218,7 +211,6 @@ class DocumentCard extends StatelessWidget {
 
                   const Spacer(),
 
-                  // Nút xóa nhanh
                   IconButton(
                     icon: const Icon(Icons.delete_outline, size: 18, color: Colors.grey),
                     tooltip: 'Xóa',
@@ -234,4 +226,3 @@ class DocumentCard extends StatelessWidget {
     );
   }
 }
-
