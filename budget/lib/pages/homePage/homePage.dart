@@ -1,3 +1,4 @@
+import 'package:budget/widgets/homePageStudyDocumentsCard.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/generatePreviewData.dart';
 import 'package:budget/database/tables.dart';
@@ -258,6 +259,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   controller: _scrollController,
                   children: [
                     PreviewDemoWarning(),
+                    const HomePageStudyDocumentsCard(),
                     if (useSmallBanner) SizedBox(height: 13),
                     Row(
                       mainAxisSize: MainAxisSize.min,

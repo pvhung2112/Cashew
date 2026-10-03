@@ -316,13 +316,9 @@ class NavigationSidebarState extends State<NavigationSidebar> {
                                 navBarIconDataKey: "about",
                                 currentPageIndex: selectedIndex,
                               ),
-                              NavigationSidebarButton(
-                                icon: Icons.menu_book_rounded,
-                                label: "Tài liệu học tập",
-                                isSelected: false,
-                                onTap: () {
-                                  pushRoute(context, StudyDocumentsPage());
-                                },
+                              NavigationSidebarButtonWithNavBarIconData(
+                                navBarIconDataKey: "studyDocuments",
+                                currentPageIndex: selectedIndex,
                               ),
                               SyncButton(),
                               SizedBox(height: 10),

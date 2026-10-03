@@ -150,6 +150,14 @@ Map<String, NavBarIconData> getNavBarIconsData() {
       labelLong: "titles-details",
       navigationIndexedStackIndex: 12,
     ),
+    "studyDocuments": NavBarIconData(
+      iconData: appStateSettings["outlinedIcons"]
+          ? Icons.menu_book_outlined
+          : Icons.menu_book_rounded,
+      label: "Tài liệu học tập",
+      labelLong: "Kho Tài liệu Học tập",
+      navigationIndexedStackIndex: 18,
+    ),
     "goalsDetails": NavBarIconData(
       iconData: appStateSettings["outlinedIcons"]
           ? Icons.savings_outlined
