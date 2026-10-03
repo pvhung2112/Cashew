@@ -151,32 +151,35 @@ class _DocumentSearchPageState extends State<DocumentSearchPage> {
                       final doc = results[index];
                       final course = coursesMap[doc.courseId];
 
-                      return DocumentCard(
-                        document: doc,
-                        course: course,
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => AddEditDocumentPage(initialDocument: doc),
-                            ),
-                          );
-                          setState(() {});
-                        },
-                        onToggleStatus: () async {
-                          final nextStatus = doc.status == DocumentStatus.completed
-                              ? DocumentStatus.todo
-                              : DocumentStatus.completed;
-                          await _documentDao.update(doc.copyWith(status: nextStatus));
-                          setState(() {});
-                        },
-                        onTogglePin: () async {
-                          await _documentDao.update(doc.copyWith(isPinned: !doc.isPinned));
-                          setState(() {});
-                        },
-                        onDelete: () async {
-                          await _documentDao.delete(doc.id);
-                          setState(() {});
-                        },
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        child: StudyDocumentCard(
+                          document: doc,
+                          course: course,
+                          onTap: () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => AddEditDocumentPage(initialDocument: doc),
+                              ),
+                            );
+                            setState(() {});
+                          },
+                          onToggleStatus: () async {
+                            final nextStatus = doc.status == DocumentStatus.completed
+                                ? DocumentStatus.todo
+                                : DocumentStatus.completed;
+                            await _documentDao.update(doc.copyWith(status: nextStatus));
+                            setState(() {});
+                          },
+                          onTogglePin: () async {
+                            await _documentDao.update(doc.copyWith(isPinned: !doc.isPinned));
+                            setState(() {});
+                          },
+                          onDelete: () async {
+                            await _documentDao.delete(doc.id);
+                            setState(() {});
+                          },
+                        ),
                       );
                     },
                   ),
@@ -186,4 +189,3 @@ class _DocumentSearchPageState extends State<DocumentSearchPage> {
     );
   }
 }
-

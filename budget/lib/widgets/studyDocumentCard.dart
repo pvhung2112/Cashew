@@ -9,16 +9,27 @@ import '../struct/studyCourse.dart';
 import '../database/study_course_dao.dart';
 import '../pages/addEditStudyDocumentPage.dart';
 
+typedef DocumentCard = StudyDocumentCard;
+
 class StudyDocumentCard extends StatelessWidget {
   final StudyDocument document;
   final ValueChanged<DocumentStatus>? onStatusChanged;
   final VoidCallback? onDelete;
+
+  final Course? course;
+  final VoidCallback? onTap;
+  final VoidCallback? onToggleStatus;
+  final VoidCallback? onTogglePin;
 
   const StudyDocumentCard({
     super.key,
     required this.document,
     this.onStatusChanged,
     this.onDelete,
+    this.course,
+    this.onTap,
+    this.onToggleStatus,
+    this.onTogglePin,
   });
 
   String _formatDate(DateTime date) {
