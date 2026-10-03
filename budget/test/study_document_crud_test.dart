@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:study_doc_manager/struct/studyDocument.dart';
-import 'package:study_doc_manager/database/database_helper.dart';
-import 'package:study_doc_manager/database/document_dao.dart';
+import 'package:budget/struct/studyDocument.dart';
+import 'package:budget/database/study_database_helper.dart';
+import 'package:budget/database/study_document_dao.dart';
 
 void main() {
   late AppDatabase db;
@@ -13,14 +13,14 @@ void main() {
     documentDao = DocumentDao(database: db);
   });
 
-  group('Checklist 3 - Kiểm thử chức năng cốt lõi (CRUD & Search/Filter)', () {
-    test('1. Thêm tài liệu học tập mới vào hệ thống', () async {
+  group('Checklist 3 - Ki?m th? ch?c nang c?t l�i (CRUD & Search/Filter)', () {
+    test('1. Th�m t�i li?u h?c t?p m?i v�o h? th?ng', () async {
       final doc = StudyDocument(
         id: 'test_doc_1',
-        title: 'Slide Thiết kế Kiến trúc Hệ thống',
+        title: 'Slide Thi?t k? Ki?n tr�c H? th?ng',
         courseId: 'c_ktpm',
         type: DocumentType.lecture,
-        description: 'Kiến trúc Local-First và Cashew',
+        description: 'Ki?n tr�c Local-First v� Cashew',
         tags: ['KTPM', 'Architecture'],
       );
 
@@ -28,37 +28,36 @@ void main() {
 
       final retrieved = documentDao.getById('test_doc_1');
       expect(retrieved, isNotNull);
-      expect(retrieved!.title, 'Slide Thiết kế Kiến trúc Hệ thống');
+      expect(retrieved!.title, 'Slide Thi?t k? Ki?n tr�c H? th?ng');
       expect(retrieved.type, DocumentType.lecture);
-      expect(retrieved.isSynced, false, reason: 'Tài liệu mới tạo cục bộ phải có isSynced = false');
+      expect(retrieved.isSynced, false, reason: 'T�i li?u m?i t?o c?c b? ph?i c� isSynced = false');
     });
 
-    test('2. Cập nhật thông tin và trạng thái tài liệu học tập', () async {
+    test('2. C?p nh?t th�ng tin v� tr?ng th�i t�i li?u h?c t?p', () async {
       final doc = StudyDocument(
         id: 'test_doc_2',
-        title: 'Bài tập 1: Vẽ sơ đồ luồng dữ liệu DFD',
+        title: 'B�i t?p 1: V? so d? lu?ng d? li?u DFD',
         courseId: 'c_ktpm',
         type: DocumentType.exercise,
         status: DocumentStatus.todo,
       );
       await documentDao.insert(doc);
 
-      // Cập nhật trạng thái sang hoàn thành
       final updated = doc.copyWith(
         status: DocumentStatus.completed,
-        title: 'Bài tập 1: Đã hoàn thành DFD',
+        title: 'B�i t?p 1: �� ho�n th�nh DFD',
       );
       await documentDao.update(updated);
 
       final result = documentDao.getById('test_doc_2');
       expect(result!.status, DocumentStatus.completed);
-      expect(result.title, 'Bài tập 1: Đã hoàn thành DFD');
+      expect(result.title, 'B�i t?p 1: �� ho�n th�nh DFD');
     });
 
-    test('3. Xóa tài liệu khỏi hệ thống lưu trữ', () async {
+    test('3. X�a t�i li?u kh?i h? th?ng luu tr?', () async {
       final doc = StudyDocument(
         id: 'test_doc_3',
-        title: 'Tài liệu tạm cần xóa',
+        title: 'T�i li?u t?m c?n x�a',
         courseId: 'c_flutter',
         type: DocumentType.reference,
       );
@@ -69,7 +68,7 @@ void main() {
       expect(documentDao.getById('test_doc_3'), isNull);
     });
 
-    test('4. Tìm kiếm tài liệu theo từ khóa (Keyword Search)', () {
+    test('4. T�m ki?m t�i li?u theo t? kh�a (Keyword Search)', () {
       final results = documentDao.filterDocuments(query: 'Cashew');
       expect(results.isNotEmpty, true);
       for (var d in results) {
@@ -80,7 +79,7 @@ void main() {
       }
     });
 
-    test('5. Lọc tài liệu đa tiêu chí: Môn học + Phân loại', () {
+    test('5. L?c t�i li?u da ti�u ch�: M�n h?c + Ph�n lo?i', () {
       final lecturesKTPM = documentDao.filterDocuments(
         courseId: 'c_ktpm',
         type: DocumentType.lecture,

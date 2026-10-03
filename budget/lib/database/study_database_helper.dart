@@ -3,7 +3,7 @@ import 'dart:convert';
 import '../struct/studyDocument.dart';
 import '../struct/studyCourse.dart';
 import '../struct/studyGoal.dart';
-import '../struct/syncClient.dart';
+import '../struct/studySyncClient.dart';
 
 /// Database Engine cục bộ đóng vai trò Single Source of Truth theo kiến trúc Local-First của Cashew.
 /// Cung cấp Reactive Streams (tương đương Drift .watch() trong Cashew) cho toàn bộ hệ thống UI.
@@ -298,4 +298,5 @@ class AppDatabase {
     _initSeedData();
   }
 }
+
 

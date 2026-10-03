@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:study_doc_manager/struct/studyDocument.dart';
-import 'package:study_doc_manager/struct/course.dart';
-import 'package:study_doc_manager/database/database_helper.dart';
-import 'package:study_doc_manager/database/document_dao.dart';
-import 'package:study_doc_manager/database/course_dao.dart';
+import 'package:budget/struct/studyDocument.dart';
+import 'package:budget/struct/studyCourse.dart';
+import 'package:budget/database/study_database_helper.dart';
+import 'package:budget/database/study_document_dao.dart';
+import 'package:budget/database/study_course_dao.dart';
 
 void main() {
   late AppDatabase db;
@@ -19,17 +19,16 @@ void main() {
 
   group('Checklist 4 - Kiểm thử tính đúng đắn của việc phân tách logic kiến trúc', () {
     test('1. Kiểm thử tính tách biệt của tầng Data Access (DAO Layer)', () {
-      // Đảm bảo DAO chỉ đảm nhiệm truy vấn và thao tác dữ liệu, độc lập với UI
       final allCourses = courseDao.getAll();
       expect(allCourses.length, greaterThanOrEqualTo(3));
 
       final c = courseDao.getById('c_ktpm');
       expect(c, isNotNull);
-      expect(c!.name, 'Kiến trúc Phần mềm');
+      expect(c!.code, 'SE301');
+      expect(c.name.contains('Kiến trúc'), true);
     });
 
     test('2. Kiểm thử cơ chế Reactive Streams (tương tự Drift .watch() trong Cashew)', () async {
-      // Khi chèn tài liệu qua DAO, Stream watchFiltered() phải tự động phát tín hiệu cập nhật
       final stream = documentDao.watchFiltered();
 
       expectLater(
@@ -48,7 +47,6 @@ void main() {
     });
 
     test('3. Kiểm thử tính toàn vẹn dữ liệu quan hệ (Cascade Delete)', () async {
-      // Tạo môn học mới và 2 tài liệu thuộc môn học đó
       final testCourse = Course(
         id: 'c_temp_delete',
         code: 'TEMP999',
@@ -72,7 +70,6 @@ void main() {
       expect(documentDao.getById('doc_temp_1'), isNotNull);
       expect(documentDao.getById('doc_temp_2'), isNotNull);
 
-      // Khi xóa môn học, tầng Storage phải tự động xóa liên hoàn các tài liệu con
       await courseDao.delete('c_temp_delete');
 
       expect(courseDao.getById('c_temp_delete'), isNull);
@@ -83,12 +80,9 @@ void main() {
     test('4. Kiểm thử chiến lược Sao lưu và Phục hồi (Backup & Restore Strategy)', () {
       final exportJson = db.exportToJson();
       expect(exportJson.isNotEmpty, true);
-      expect(exportJson.contains('Kiến trúc Phần mềm'), true);
+      expect(exportJson.contains('SE301'), true);
 
-      // Xóa trắng DB
       db.resetDatabase();
-
-      // Tiến hành khôi phục từ JSON
       db.importFromJson(exportJson);
 
       final restoredDocs = documentDao.getAll();

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:study_doc_manager/struct/studyDocument.dart';
-import 'package:study_doc_manager/struct/syncClient.dart';
-import 'package:study_doc_manager/database/database_helper.dart';
-import 'package:study_doc_manager/database/document_dao.dart';
+import 'package:budget/struct/studyDocument.dart';
+import 'package:budget/struct/studySyncClient.dart';
+import 'package:budget/database/study_database_helper.dart';
+import 'package:budget/database/study_document_dao.dart';
 
 void main() {
   late AppDatabase db;
@@ -17,11 +17,11 @@ void main() {
     syncClient.reset();
   });
 
-  group('Checklist 4 - Kiểm thử cơ chế Sync Client Local-First (tương tự Cashew)', () {
-    test('1. Kiểm thử hàng đợi đồng bộ khi có tài liệu mới tạo offline', () async {
+  group('Checklist 4 - Ki?m th? co ch? Sync Client Local-First (tuong t? Cashew)', () {
+    test('1. Ki?m th? h�ng d?i d?ng b? khi c� t�i li?u m?i t?o offline', () async {
       final doc = StudyDocument(
         id: 'sync_test_1',
-        title: 'Tài liệu tạo offline',
+        title: 'T�i li?u t?o offline',
         courseId: 'c_ktpm',
         type: DocumentType.lecture,
       );
@@ -33,7 +33,7 @@ void main() {
       expect(syncClient.pendingSyncCount, greaterThan(0));
     });
 
-    test('2. Kiểm thử tiến trình đồng bộ 2 chiều lên Cloud Server', () async {
+    test('2. Ki?m th? ti?n tr�nh d?ng b? 2 chi?u l�n Cloud Server', () async {
       final unsynced = documentDao.getUnsyncedDocuments();
       expect(unsynced.isNotEmpty, true);
 
@@ -42,7 +42,6 @@ void main() {
       expect(syncClient.status, SyncStatus.synced);
       expect(syncClient.lastSyncTime, isNotNull);
 
-      // Cập nhật trạng thái đã đồng bộ vào DAO
       await documentDao.markAsSynced(unsynced.map((d) => d.id).toList());
 
       final remainingUnsynced = documentDao.getUnsyncedDocuments();
