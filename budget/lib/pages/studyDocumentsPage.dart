@@ -7,14 +7,14 @@ import '../widgets/studyDocumentCard.dart';
 import 'addEditStudyDocumentPage.dart';
 import 'studyDocumentSearchPage.dart';
 
-class DocumentsPage extends StatefulWidget {
-  const DocumentsPage({super.key});
+class StudyDocumentsPage extends StatefulWidget {
+  const StudyDocumentsPage({super.key});
 
   @override
-  State<DocumentsPage> createState() => _DocumentsPageState();
+  State<StudyDocumentsPage> createState() => _StudyDocumentsPageState();
 }
 
-class _DocumentsPageState extends State<DocumentsPage> with SingleTickerProviderStateMixin {
+class _StudyDocumentsPageState extends State<StudyDocumentsPage> with SingleTickerProviderStateMixin {
   final _documentDao = DocumentDao();
   final _courseDao = CourseDao();
 
@@ -53,11 +53,11 @@ class _DocumentsPageState extends State<DocumentsPage> with SingleTickerProvider
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kho Tài liệu Học tập'),
+        title: const Text('Kho TÃƒÂ i liÃ¡Â»â€¡u HÃ¡Â»Âc tÃ¡ÂºÂ­p'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
-            tooltip: 'Tìm kiếm & Bộ lọc',
+            tooltip: 'TÃƒÂ¬m kiÃ¡ÂºÂ¿m & BÃ¡Â»â„¢ lÃ¡Â»Âc',
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const DocumentSearchPage()),
@@ -69,16 +69,16 @@ class _DocumentsPageState extends State<DocumentsPage> with SingleTickerProvider
           isScrollable: false,
           indicatorColor: Colors.white,
           tabs: const [
-            Tab(text: 'Tất cả'),
-            Tab(text: 'Bài giảng'),
-            Tab(text: 'Bài tập'),
-            Tab(text: 'Tham khảo'),
+            Tab(text: 'TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£'),
+            Tab(text: 'BÃƒÂ i giÃ¡ÂºÂ£ng'),
+            Tab(text: 'BÃƒÂ i tÃ¡ÂºÂ­p'),
+            Tab(text: 'Tham khÃ¡ÂºÂ£o'),
           ],
         ),
       ),
       body: Column(
         children: [
-          // Thanh lọc nhanh môn học dạng Chips
+          // Thanh lÃ¡Â»Âc nhanh mÃƒÂ´n hÃ¡Â»Âc dÃ¡ÂºÂ¡ng Chips
           StreamBuilder<List<Course>>(
             stream: _courseDao.watchAll(),
             initialData: _courseDao.getAll(),
@@ -92,7 +92,7 @@ class _DocumentsPageState extends State<DocumentsPage> with SingleTickerProvider
                 child: Row(
                   children: [
                     ChoiceChip(
-                      label: const Text('Tất cả môn'),
+                      label: const Text('TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£ mÃƒÂ´n'),
                       selected: _selectedCourseId == null,
                       onSelected: (val) => setState(() => _selectedCourseId = null),
                     ),
@@ -119,7 +119,7 @@ class _DocumentsPageState extends State<DocumentsPage> with SingleTickerProvider
           ),
           const Divider(height: 1),
 
-          // Danh sách tài liệu phản hồi Reactive Stream
+          // Danh sÃƒÂ¡ch tÃƒÂ i liÃ¡Â»â€¡u phÃ¡ÂºÂ£n hÃ¡Â»â€œi Reactive Stream
           Expanded(
             child: StreamBuilder<List<StudyDocument>>(
               stream: _documentDao.watchFiltered(
@@ -142,7 +142,7 @@ class _DocumentsPageState extends State<DocumentsPage> with SingleTickerProvider
                         Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey.shade400),
                         const SizedBox(height: 12),
                         Text(
-                          'Không có tài liệu nào trong mục này',
+                          'KhÃƒÂ´ng cÃƒÂ³ tÃƒÂ i liÃ¡Â»â€¡u nÃƒÂ o trong mÃ¡Â»Â¥c nÃƒÂ y',
                           style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                         ),
                       ],
@@ -190,7 +190,7 @@ class _DocumentsPageState extends State<DocumentsPage> with SingleTickerProvider
           MaterialPageRoute(builder: (_) => const AddEditDocumentPage()),
         ),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Thêm tài liệu'),
+        label: const Text('ThÃƒÂªm tÃƒÂ i liÃ¡Â»â€¡u'),
       ),
     );
   }

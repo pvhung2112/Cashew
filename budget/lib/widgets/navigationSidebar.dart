@@ -318,10 +318,10 @@ class NavigationSidebarState extends State<NavigationSidebar> {
                               ),
                               NavigationSidebarButton(
                                 icon: Icons.menu_book_rounded,
-                                label: "Tài liệu học tập",
+                                label: "TÃ i liá»‡u há»c táº­p",
                                 isSelected: false,
                                 onTap: () {
-                                  pushRoute(context, const StudyDocumentsPage());
+                                  pushRoute(context, StudyDocumentsPage());
                                 },
                               ),
                               SyncButton(),
