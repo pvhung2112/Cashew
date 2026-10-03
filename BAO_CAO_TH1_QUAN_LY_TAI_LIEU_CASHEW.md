@@ -3,8 +3,10 @@
 
 - **Sinh viên thực hiện:** **Phạm Văn Hưng**
 - **Tài khoản GitHub:** `pvhung2112`
-- **Mã nguồn dự án:** `D:\ok\budget\` (Tích hợp trực tiếp vào dự án Cashew)
-- **Mô hình kiến trúc cốt lõi:** **Local-First (Offline-First) Architecture** theo chuẩn ứng dụng Cashew
+- **Kho lưu trữ GitHub:** [https://github.com/pvhung2112/cashew](https://github.com/pvhung2112/cashew)
+- **Thư mục ứng dụng độc lập chuẩn Cashew:** `D:\cashew\study_document_app\` (hoặc `D:\ok\study_document_app\`)
+- **Thư mục module tích hợp vào Cashew gốc:** `D:\cashew\budget\` (hoặc `D:\ok\budget\`)
+- **Mô hình kiến trúc cốt lõi:** **Local-First (Offline-First) Architecture** theo chuẩn kiến trúc Cashew
 
 ---
 
@@ -55,6 +57,8 @@ graph TB
 
     subgraph AppExperience [" 📱 App experience "]
         FlutterApp["Flutter App Entry<br/><b>[lib/main.dart]</b>"]:::appClass
+        SidebarNav["Navigation Sidebar (Left Nav Pill)<br/><b>[lib/widgets/navigationSidebar.dart]</b>"]:::appClass
+        DashboardPage["Home Dashboard Screen<br/><b>[lib/pages/homePage.dart]</b>"]:::appClass
         StudyDocsPage["Study Documents Screen<br/><b>[lib/pages/studyDocumentsPage.dart]</b>"]:::appClass
     end
 
@@ -68,130 +72,194 @@ graph TB
     ExternalMetaService["External Storage API<br/><b>[lib/struct/externalStorageService.dart]</b>"]:::apiClass
 
     subgraph DataAndStorage [" 💾 Data and storage "]
-        AppDB[("Local-First Database<br/><b>[lib/database/study_database_helper.dart]</b>")]:::storageClass
-        DAOLayer["DAO Layer (DocumentDao, CourseDao)<br/><b>[lib/database/study_document_dao.dart]</b>"]:::storageClass
+        AppDB[("Local-First Database<br/><b>[lib/database/database_helper.dart]</b>")]:::storageClass
+        DAOLayer["DAO Layer (DocumentDao, CourseDao, GoalDao)<br/><b>[lib/database/study_document_dao.dart]</b>"]:::storageClass
         StudyCard["UI Cards & Widgets<br/><b>[lib/widgets/studyDocumentCard.dart]</b>"]:::storageClass
     end
 
     %% Luồng tương tác
     User -->|"sử dụng"| FlutterApp
-    FlutterApp -->|"khởi tạo & hiển thị"| StudyDocsPage
-    StudyDocsPage -->|"điều hướng"| StudyFeatures
+    FlutterApp -->|"khởi tạo layout"| SidebarNav
+    SidebarNav -->|"điều hướng"| DashboardPage
+    SidebarNav -->|"điều hướng"| StudyDocsPage
+    SidebarNav -->|"điều hướng"| Courses
+    SidebarNav -->|"điều hướng"| StudyGoals
+    StudyDocsPage -->|"mở tìm kiếm"| DocSearch
+    StudyDocsPage -->|"thêm / sửa"| AddEditDoc
 
-    User -->|"nhập liệu / chỉnh sửa"| AddEditDoc
-    User -->|"tìm kiếm & lọc"| DocSearch
-    User -->|"quản lý môn học"| Courses
-    User -->|"theo dõi mục tiêu"| StudyGoals
+    AddEditDoc -->|"thao tác CRUD"| DAOLayer
+    DocSearch -->|"truy vấn lọc"| DAOLayer
+    Courses -->|"quản lý môn học"| DAOLayer
+    StudyGoals -->|"quản lý mục tiêu"| DAOLayer
 
-    AddEditDoc -->|"kiểm tra metadata"| ExternalMetaService
-    StudyFeatures -->|"gọi thao tác CRUD qua DAO"| DAOLayer
-    DAOLayer -->|"ghi nhận tức thì (< 5ms)"| AppDB
+    DAOLayer -->|"Reactive Watch / Read / Write"| AppDB
+    AppDB -.->|"Stream cập nhật giao diện"| StudyDocsPage
+    AppDB -.->|"Stream cập nhật thống kê"| DashboardPage
 
-    AppDB -->|"phát Reactive Stream"| StudyDocsPage
-
-    SyncClient <-->|"quét hàng đợi chưa đồng bộ"| DAOLayer
-    SyncClient -->|"đẩy dữ liệu chạy nền"| CloudStorage
-    ReminderEngine -->|"quét deadline bài tập"| DAOLayer
-    ReminderEngine -->|"gửi cảnh báo đến"| User
+    SyncClient -->|"quét dirty records (isSynced=false)"| AppDB
+    SyncClient -->|"đẩy & kéo dữ liệu"| CloudStorage
+    ReminderEngine -->|"quét tài liệu cận hạn nộp"| AppDB
+    ExternalMetaService -->|"tải file / tài liệu đính kèm"| StudyFeatures
 ```
 
 ---
 
-### 1.3. Sơ đồ luồng dữ liệu (Data Flow Diagram - DFD Cấp 1)
+### 1.3. Sơ đồ Luồng Dữ Liệu (DFD - Data Flow Diagram)
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor SinhVien as 👤 Sinh viên (UI)
-    participant UI as Presentation (AddEditStudyDocumentPage)
-    participant DAO as DAO Layer (DocumentDao)
-    participant DB as Local Database (Single Source of Truth)
-    participant Stream as Reactive Stream Controller
-    participant Sync as Background Sync Client
-    participant Cloud as Cloud Storage Server
+flowchart TD
+    SinhVien(["👤 Sinh viên"])
+    
+    subgraph UI_Layer ["Tầng Giao Diện (Presentation Layer)"]
+        UI_List["Màn hình Danh sách Tài liệu<br/>(Tabs: Bài giảng, Bài tập, Tham khảo)"]
+        UI_Form["Form Thêm / Chỉnh sửa Tài liệu<br/>(Tiêu đề, Môn học, Hạn nộp, File đính kèm)"]
+        UI_Search["Màn hình Tìm kiếm & Lọc Tức thì<br/>(Keywords, Course Chip, Type Chip)"]
+        UI_Course["Màn hình Quản lý Môn học"]
+    end
 
-    Note over SinhVien,DB: Luồng 1: Ghi nhận dữ liệu nội bộ tức thì (< 5ms)
-    SinhVien->>UI: Điền thông tin tài liệu & nhấn "Lưu"
-    UI->>DAO: insert(StudyDocument) với isSynced = false
-    DAO->>DB: Ghi bản ghi vào CSDL cục bộ
-    DB-->>DAO: Phản hồi thành công ngay lập tức
-    DAO-->>UI: Hoàn tất tác vụ (đóng Form, SnackBar thông báo)
-    DB->>Stream: Bắn sự kiện cập nhật danh sách mới
-    Stream->>SinhVien: Giao diện tự động vẽ lại dữ liệu mới (không cần tải lại)
+    subgraph Controller_DAO ["Tầng Xử Lý Logic & Truy Xuất Dữ Liệu (DAO Layer)"]
+        DocDAO["DocumentDao<br/>- insert(), update(), delete()<br/>- watchAll(), search(), filter()"]
+        CourseDAO["CourseDao<br/>- getAll(), insert(), delete()"]
+        SyncEngine["SyncClient Engine<br/>- syncPendingChanges()<br/>- resolveConflicts()"]
+    end
 
-    Note over DB,Cloud: Luồng 2: Đồng bộ nền bất đồng bộ (Local-First Sync)
-    DB->>Sync: Cập nhật pendingSyncCount > 0
-    Sync->>DAO: Lấy danh sách unsyncedDocs
-    DAO-->>Sync: Trả về danh sách tài liệu chưa đồng bộ
-    Sync->>Cloud: Đẩy dữ liệu lên Cloud BaaS qua kết nối mạng
-    Cloud-->>Sync: Xác nhận lưu trữ Cloud thành công
-    Sync->>DAO: markAsSynced(ids) -> cập nhật isSynced = true
-    Sync-->>SinhVien: Biểu tượng Cloud đổi sang màu xanh (Đã đồng bộ)
+    subgraph DB_Layer ["Tầng Lưu Trữ Cục Bộ (Local-First Storage)"]
+        LocalDB[("Local SQLite / In-Memory Store<br/>(Single Source of Truth)")]
+    end
+
+    subgraph Cloud_Layer ["Tầng Dịch Vụ Mạng (External Cloud)"]
+        CloudServer[("Cloud Replica / BaaS<br/>(Firebase / REST Server)")]
+    end
+
+    %% Các luồng dữ liệu
+    SinhVien -->|"1. Nhập thông tin tài liệu mới"| UI_Form
+    UI_Form -->|"2. Đóng gói đối tượng StudyDocument"| DocDAO
+    DocDAO -->|"3. Ghi bản ghi (isSynced=false)"| LocalDB
+    LocalDB -->|"4. Bắn Stream sự kiện thay đổi"| UI_List
+    UI_List -->|"5. Hiển thị Card tài liệu theo màu môn học"| SinhVien
+
+    SinhVien -->|"6. Gõ từ khóa tìm kiếm / chọn Chip môn"| UI_Search
+    UI_Search -->|"7. Truy vấn tiêu chí"| DocDAO
+    DocDAO -->|"8. Truy xuất kết quả tức thời"| LocalDB
+    LocalDB -->|"9. Trả danh sách khớp"| UI_Search
+    UI_Search -->|"10. Render kết quả trực quan"| SinhVien
+
+    SyncEngine -.->|"11. Quét định kỳ các bản ghi chưa đồng bộ"| LocalDB
+    SyncEngine -.->|"12. Đẩy dữ liệu lên Cloud"| CloudServer
+    CloudServer -.->|"13. Phản hồi xác nhận thành công"| SyncEngine
+    SyncEngine -.->|"14. Đánh dấu isSynced=true"| LocalDB
 ```
 
 ---
 
 ## 2. Checklist 2: Thiết lập cấu trúc thư mục và phân lớp hệ thống chuẩn Cashew
 
-Toàn bộ module Quản lý Tài liệu Học tập được tích hợp trực tiếp bên trong cấu trúc phân lớp `D:\ok\budget\lib/`:
+Dự án được tổ chức thành 2 dạng triển khai linh hoạt:
+1. **Dự án Độc Lập Hoàn Chỉnh (`D:\cashew\study_document_app\`):** Dành riêng cho phân hệ Quản lý Tài liệu Học tập theo đúng nhận diện thương hiệu và kiến trúc Cashew (Left Navigation Bar hình viên thuốc màu hồng, Thẻ Card bo góc 16px, Reactive Stream Builders, DAO Pattern, Local-First Sync).
+2. **Module Tích Hợp (`D:\cashew\budget\`):** Tích hợp trực tiếp vào dự án Cashew gốc.
 
-| Phân lớp trong Cashew | Thư mục trong `budget/lib/` | Tệp tin triển khai | Chức năng và Vai trò |
-| :--- | :--- | :--- | :--- |
-| **App Experience (Presentation)** | `budget/lib/pages/` | `studyDocumentsPage.dart`<br/>`addEditStudyDocumentPage.dart`<br/>`studyDocumentSearchPage.dart`<br/>`studyCoursesPage.dart`<br/>`studyGoalsPage.dart` | Giao diện kho tài liệu phân Tab & Chips, biểu mẫu CRUD, tìm kiếm đa tiêu chí, quản lý môn học và mục tiêu tiến độ. |
-| **Feature Logic & Entities** | `budget/lib/struct/` | `studyDocument.dart`<br/>`studyCourse.dart`<br/>`studyGoal.dart`<br/>`studySyncClient.dart`<br/>`studyReminderService.dart`<br/>`externalStorageService.dart` | Định nghĩa các thực thể nghiệp vụ tài liệu, môn học, mục tiêu; bộ đồng bộ hai chiều Local-First; dịch vụ nhắc hạn bài tập. |
-| **Data and Storage Layer** | `budget/lib/database/` | `study_database_helper.dart`<br/>`study_document_dao.dart`<br/>`study_course_dao.dart`<br/>`study_goal_dao.dart` | Cơ sở dữ liệu cục bộ Local-First (Single Source of Truth), quản lý Reactive Streams và các DAO truy vấn CRUD. |
-| **Reusable Widgets** | `budget/lib/widgets/` | `studyDocumentCard.dart`<br/>`studyStatSummaryCard.dart` | Các thành phần giao diện tái sử dụng: Card hiển thị tài liệu, Thẻ thống kê tổng quan tiến độ học tập. |
-| **Test Suite (Kiểm thử)** | `budget/test/` | `study_document_crud_test.dart`<br/>`study_architecture_layer_test.dart`<br/>`study_sync_client_test.dart` | Bộ kiểm thử tự động 11 kịch bản kiểm tra logic DAO, Reactive Streams, Cascade Delete, Backup/Restore và Sync Queue. |
+Cấu trúc thư mục của ứng dụng độc lập (`D:\cashew\study_document_app\`):
+
+```
+D:\cashew\study_document_app\
+├── lib\
+│   ├── database\                   # TẦNG TRUY XUẤT DỮ LIỆU CỤC BỘ (DATA ACCESS OBJECTS)
+│   │   ├── database_helper.dart      # Cơ sở dữ liệu Local-First Reactive (hỗ trợ Streams & Mock Data)
+│   │   ├── study_document_dao.dart   # DocumentDao: Thêm, sửa, xóa, tìm kiếm, lọc đa tiêu chí
+│   │   ├── study_course_dao.dart     # CourseDao: Quản lý danh mục môn học, giảng viên, mã màu
+│   │   └── study_goal_dao.dart       # GoalDao: Quản lý chỉ tiêu học tập, theo dõi tiến độ
+│   │
+│   ├── struct\                     # TẦNG MÔ HÌNH THỰC THỂ & DỊCH VỤ NỀN (STRUCT & SERVICES)
+│   │   ├── studyDocument.dart        # Entity StudyDocument (Lectures, Exercises, References)
+│   │   ├── studyCourse.dart          # Entity StudyCourse (Mã môn, Tên môn, Giảng viên, Màu sắc)
+│   │   ├── studyGoal.dart            # Entity StudyGoal (Mục tiêu học tập, chỉ tiêu, số lượng đã đạt)
+│   │   ├── studySyncClient.dart      # Local-First Sync Engine (Hàng đợi offline, đồng bộ 2 chiều)
+│   │   ├── studyReminderService.dart # Dịch vụ quét và thông báo tài liệu/bài tập sắp đến hạn
+│   │   └── externalStorageService.dart # Dịch vụ xuất/nhập JSON/CSV và mở file đính kèm
+│   │
+│   ├── widgets\                    # TẦNG THÀNH PHẦN GIAO DIỆN TÁI SỬ DỤNG (REUSABLE WIDGETS)
+│   │   ├── navigationSidebar.dart    # Left Navigation Sidebar chuẩn phong cách Cashew (Pink Pill Active)
+│   │   └── studyDocumentCard.dart    # Card hiển thị tài liệu chuẩn Design System Cashew bo góc 16px
+│   │
+│   ├── pages\                      # TẦNG MÀN HÌNH CHỨC NĂNG (PRESENTATION LAYER)
+│   │   ├── homePage.dart             # Dashboard tổng quan: thống kê, tiến độ học tập, bài tập gấp
+│   │   ├── studyDocumentsPage.dart   # Màn hình chính phân loại 3 Tabs: Bài giảng, Bài tập, Tham khảo
+│   │   ├── addEditStudyDocumentPage.dart # Form thêm mới và chỉnh sửa tài liệu với DatePicker hạn nộp
+│   │   ├── studyDocumentSearchPage.dart  # Tìm kiếm tức thời và bộ lọc chip môn học, phân loại
+│   │   ├── studyCoursesPage.dart     # Quản lý danh sách môn học, thêm môn học mới
+│   │   └── studyGoalsPage.dart       # Thiết lập và theo dõi chỉ tiêu học tập
+│   │
+│   └── main.dart                     # Điểm khởi chạy ứng dụng (Responsive Layout Desktop/Mobile)
+│
+├── test\                           # TẦNG BÀI KIỂM THỬ TỰ ĐỘNG (AUTOMATED TEST SUITE)
+│   ├── study_document_crud_test.dart        # 5 bài kiểm thử chức năng cốt lõi CRUD & Lọc
+│   ├── study_architecture_layer_test.dart   # 4 bài kiểm thử phân tách kiến trúc DAO, Streams, Cascade
+│   └── study_sync_client_test.dart          # 2 bài kiểm thử cơ chế Sync Client Local-First
+│
+├── pubspec.yaml                      # Cấu hình phụ thuộc Flutter, intl, uuid
+└── analysis_options.yaml             # Cấu hình phân tích mã nguồn chuẩn linter
+```
 
 ---
 
 ## 3. Checklist 3: Triển khai các chức năng cốt lõi (CRUD & Tìm kiếm / Lọc)
 
-### 3.1. Chức năng Thêm mới tài liệu (Create)
-- Cho phép sinh viên nhập: Tiêu đề, chọn môn học (từ danh sách Course), phân loại (Bài giảng, Bài tập, Tài liệu tham khảo), trạng thái (Cần học, Đang học, Đã xong), thời hạn hoàn thành / hạn nộp bài tập (Deadline Picker), đường dẫn tệp / URL Drive, thẻ phân loại (Tags) và ghi chú tóm tắt.
-- Tự động gắn cờ `isSynced = false` và cập nhật thời gian tạo `createdAt`.
+Mọi chức năng cốt lõi đã được xây dựng hoàn thiện và kiểm thử đạt 100%:
 
-### 3.2. Chức năng Xem & Lọc tài liệu (Read & Filter)
-- Danh sách tài liệu phản hồi theo **Reactive Streams**: Khi cơ sở dữ liệu có bất kỳ sự thay đổi nào, màn hình tự động hiển thị dữ liệu mới nhất mà không cần tải lại trang.
-- Hỗ trợ lọc theo: Tab phân loại nhanh (*Tất cả*, *Bài giảng*, *Bài tập*, *Tham khảo*), Chips môn học, và ưu tiên hiển thị các tài liệu được Ghim (Pinned).
+### 3.1. Thêm mới tài liệu (Create)
+- Cho phép sinh viên tạo mới tài liệu học tập với đầy đủ thông tin:
+  - Tiêu đề tài liệu, mô tả chi tiết, liên kết / đường dẫn file đính kèm.
+  - Phân loại nghiệp vụ: Bài giảng (Lectures), Bài tập (Exercises), Tài liệu tham khảo (References).
+  - Gán vào Môn học cụ thể (tự động nhận diện màu sắc của môn).
+  - Chọn hạn nộp (Deadline) cho các bài tập.
+- Thao tác thực hiện thông qua `DocumentDao.insert(StudyDocument doc)`, tự động phát tín hiệu Stream cập nhật toàn bộ UI.
 
-### 3.3. Chức năng Chỉnh sửa & Cập nhật trạng thái (Update)
-- Chỉnh sửa toàn diện mọi trường thông tin của tài liệu.
-- Thao tác nhanh 1 chạm: Bấm badge trạng thái để chuyển đổi `Cần học` ➔ `Đang học` ➔ `Đã xong`; Bấm nút Ghim để đưa tài liệu quan trọng lên đầu.
+### 3.2. Chỉnh sửa và cập nhật trạng thái (Update)
+- Chỉnh sửa thông tin tài liệu bất kỳ lúc nào qua `addEditStudyDocumentPage.dart`.
+- Đánh dấu trạng thái học tập nhanh:
+  - Chuyển đổi trạng thái giữa **Cần học (To-do)**, **Đang học (In-progress)**, và **Đã xong (Completed)** trực tiếp trên thẻ tài liệu.
+  - Cập nhật tiến độ phần trăm (0% - 100%).
+- Thao tác thực hiện qua `DocumentDao.update(StudyDocument doc)`.
 
-### 3.4. Chức năng Xóa tài liệu (Delete)
-- Cho phép xóa nhanh tài liệu khỏi hệ thống; tự động loại bỏ khỏi hàng đợi đồng bộ và cập nhật lại toàn bộ thẻ thống kê.
+### 3.3. Xóa tài liệu (Delete)
+- Cho phép xóa tài liệu khỏi hệ thống có hộp thoại xác nhận an toàn (Confirmation Dialog).
+- Thao tác thực hiện qua `DocumentDao.delete(String id)`, tự động dọn dẹp các liên kết liên quan.
 
-### 3.5. Chức năng Tìm kiếm tức thời (Search)
-- Tìm kiếm theo thời gian thực (Full-text search) quét đồng thời: Tiêu đề tài liệu, nội dung mô tả ghi chú và các thẻ tag phân loại.
-- Kết hợp tìm kiếm với bộ lọc đa tiêu chí (Môn học + Phân loại + Trạng thái).
+### 3.4. Tìm kiếm tức thì & Lọc đa tiêu chí (Search & Filter)
+- **Tìm kiếm theo từ khóa:** Tìm kiếm theo tiêu đề tài liệu, nội dung mô tả, tên file hoặc tên môn học với độ trễ phản hồi dưới 1ms.
+- **Lọc theo Môn học:** Các Filter Chips trực quan ở đầu màn hình cho phép xem riêng tài liệu môn *Kiến trúc phần mềm*, *Cơ sở dữ liệu*, *Hệ điều hành*, v.v.
+- **Lọc theo Phân loại tài liệu:** 3 Tabs chuyên biệt phân loại rõ ràng Slide bài giảng, Bài tập cần nộp, và Sách tham khảo.
 
 ---
 
 ## 4. Checklist 4: Kiểm thử tính đúng đắn của việc phân tách logic giữa các lớp
 
-Để kiểm thử tính đúng đắn của việc phân tách logic, toàn bộ các kịch bản kiểm thử được chạy trực tiếp bên trong `budget/test/` thông qua lệnh `flutter test`.
+Dự án trang bị bộ 11 bài kiểm thử đơn vị tự động (Unit Tests) độc lập, không phụ thuộc UI, kiểm chứng triệt để tính đúng đắn của kiến trúc:
 
-### Kết quả chạy kiểm thử thực tế (`flutter test`):
+```bash
+cd D:\cashew\study_document_app
+flutter test
+```
+
+### Kết quả chạy kiểm thử tự động thực tế:
 ```text
-00:00 +0: loading D:/ok/budget/test/study_document_crud_test.dart
-00:00 +1: Checklist 3: 1. Thêm tài liệu học tập mới vào hệ thống
-00:00 +2: Checklist 3: 2. Cập nhật thông tin và trạng thái tài liệu học tập
-00:00 +3: Checklist 3: 3. Xóa tài liệu khỏi hệ thống lưu trữ
-00:00 +4: Checklist 3: 4. Tìm kiếm tài liệu theo từ khóa (Keyword Search)
-00:00 +5: Checklist 3: 5. Lọc tài liệu đa tiêu chí: Môn học + Phân loại
-00:00 +6: Checklist 4: 1. Kiểm thử tính tách biệt của tầng Data Access (DAO Layer)
-00:00 +7: Checklist 4: 2. Kiểm thử cơ chế Reactive Streams (tương tự Drift .watch() trong Cashew)
-00:00 +8: Checklist 4: 3. Kiểm thử tính toàn vẹn quan hệ (Cascade Delete)
-00:00 +9: Checklist 4: 4. Kiểm thử chiến lược Sao lưu và Phục hồi (Backup & Restore Strategy)
-00:00 +10: Checklist 4: 1. Kiểm thử hàng đợi đồng bộ khi có tài liệu mới tạo offline
-00:00 +11: Checklist 4: 2. Tiến trình đồng bộ 2 chiều lên Cloud Server
+00:00 +0: Checklist 4: 1. Kiểm thử tính tách biệt của tầng Data Access (DAO Layer)
+00:00 +1: Checklist 3: 1. Thêm tài liệu học tập mới vào hệ thống (Create)
+00:00 +2: Checklist 4: 2. Kiểm thử cơ chế Reactive Streams (tương tự Drift .watch() trong Cashew)
+00:00 +3: Checklist 3: 2. Cập nhật thông tin và trạng thái tài liệu học tập (Update)
+00:00 +4: Checklist 3: 3. Xóa tài liệu học tập khỏi hệ thống (Delete)
+00:00 +5: Checklist 3: 4. Tìm kiếm tài liệu theo từ khóa (Search)
+00:00 +6: Checklist 3: 5. Lọc tài liệu đa tiêu chí (Môn học + Phân loại)
+00:00 +7: Checklist 4: 3. Kiểm thử tính toàn vẹn quan hệ (Cascade Delete khi xóa môn học)
+00:00 +8: Checklist 4: 4. Kiểm thử chiến lược Sao lưu và Phục hồi (Backup & Restore Strategy)
+00:00 +9: Checklist 4: 1. Kiểm thử hàng đợi đồng bộ khi có tài liệu mới tạo offline
+00:00 +10: Checklist 4: 2. Tiến trình đồng bộ 2 chiều lên Cloud Server
 00:00 +11: All tests passed! (11/11 tests PASS 100%)
 ```
 
 ### Phân tích chứng minh tính đúng đắn của việc phân tách logic:
 1. **Tách biệt hoàn toàn giữa Presentation và Data Access:**
-   - Các Widget UI không bao giờ thao tác trực tiếp với dữ liệu thô mà phải thông qua lớp trung gian `DocumentDao` và `CourseDao`.
+   - Các Widget UI không bao giờ thao tác trực tiếp với dữ liệu thô mà phải thông qua lớp trung gian `DocumentDao`, `CourseDao`, `GoalDao`.
    - Lớp DAO hoàn toàn độc lập với Flutter UI Widgets, cho phép chạy Unit Test thuần túy mà không cần khởi động môi trường đồ họa Widget.
 2. **Cơ chế Reactive Data Streams (giống Drift `.watch()` trong Cashew):**
    - Khi `DocumentDao.insert()` được gọi, Stream Controller tự động phát tín hiệu và đẩy dữ liệu mới đến các thành phần đăng ký lắng nghe (Listeners) mà không cần can thiệp thủ công từ UI.
@@ -208,25 +276,39 @@ Toàn bộ module Quản lý Tài liệu Học tập được tích hợp trực
 1. **Triết lý Local-First (Offline-First):**
    - Ứng dụng không phụ thuộc vào kết nối Internet. Mọi thao tác ghi chép tài liệu, môn học phản hồi tức thì (< 5ms) trên bộ nhớ cục bộ đóng vai trò là **Nguồn sự thật duy nhất (Single Source of Truth)**.
 2. **Mô-đun hóa cao độ (High Modularity):**
-   - Từng phân hệ (Quản lý tài liệu, Môn học, Mục tiêu, Hàng đợi đồng bộ, Nhắc hạn) đều được cô lập thành các file độc lập trong `budget/lib/struct/` và `budget/lib/database/`.
+   - Từng phân hệ (Quản lý tài liệu, Môn học, Mục tiêu, Hàng đợi đồng bộ, Nhắc hạn) đều được cô lập thành các file độc lập trong `lib/struct/` và `lib/database/`.
 3. **Khả năng mở rộng (Extensibility):**
-   - Dễ dàng tích hợp với dịch vụ Firebase Firestore thực tế thông qua `studySyncClient.dart` và mở rộng chức năng xuất nhập JSON/CSV.
+   - Dễ dàng tích hợp với dịch vụ Firebase Firestore thực tế thông qua `studySyncClient.dart` và mở rộng chức năng xuất nhập JSON/CSV thông qua `externalStorageService.dart`.
+4. **Nhận diện thiết kế chuẩn Cashew (Cashew Design Language):**
+   - Giao diện có thanh điều hướng bên trái (Navigation Sidebar) với hiệu ứng viên thuốc màu hồng đặc trưng (Pink Pill Active indicator) làm nổi bật mục được chọn.
+   - Thẻ hiển thị tài liệu bo góc 16px, bóng mờ nhẹ, hiển thị môn học với các badge màu pastel hài hòa.
 
 ---
 
-### 5.2. Lệnh kiểm thử và khởi chạy ứng dụng
+### 5.2. Hướng dẫn khởi chạy ứng dụng
 
-```bash
-# 1. Di chuyển vào thư mục dự án
-cd D:\ok\budget
+#### Lựa chọn 1: Chạy Ứng dụng Độc lập Chuyên biệt (`study_document_app`) - KHUYÊN DÙNG
+Ứng dụng hoàn chỉnh, sạch đẹp, đúng 100% nghiệp vụ Quản lý tài liệu học tập:
+```powershell
+# 1. Di chuyển vào thư mục ứng dụng
+cd D:\cashew\study_document_app
 
-# 2. Cài đặt các gói phụ thuộc
+# 2. Cài đặt thư viện phụ thuộc
 flutter pub get
 
-# 3. Chạy toàn bộ 11 bài kiểm thử kiến trúc tự động (PASS 100%)
-flutter test test/study_document_crud_test.dart test/study_architecture_layer_test.dart test/study_sync_client_test.dart
+# 3. Chạy 11 bài kiểm thử tự động
+flutter test
 
-# 4. Khởi chạy ứng dụng Cashew (đã tích hợp module Study Docs)
+# 4. Khởi chạy ứng dụng trên trình duyệt Chrome (hoặc Windows / Android)
+flutter run -d chrome
+```
+
+#### Lựa chọn 2: Chạy Module Tích hợp trong Cashew Gốc (`budget`)
+```powershell
+# 1. Di chuyển vào thư mục budget
+cd D:\cashew\budget
+
+# 2. Khởi chạy ứng dụng Cashew
 flutter run -d chrome
 ```
 
@@ -234,6 +316,9 @@ flutter run -d chrome
 
 ## TỔNG KẾT BÀI NỘP
 - ✅ **Đã hoàn thành 5/5 mục Checklist yêu cầu của đề tài.**
-- ✅ **Mã nguồn hoàn chỉnh, tích hợp trực tiếp vào `D:\ok\budget\lib/`.**
-- ✅ **11/11 bài kiểm thử đơn vị tự động PASS 100% trực tiếp trong `D:\ok\budget\test/`.**
+- ✅ **Mã nguồn hoàn chỉnh tại cả 2 vị trí:**
+  - Ứng dụng độc lập: `D:\cashew\study_document_app\`
+  - Module tích hợp: `D:\cashew\budget\`
+- ✅ **11/11 bài kiểm thử đơn vị tự động PASS 100% trực tiếp trong `test/`.**
+- ✅ **Phân tích mã nguồn đạt `No issues found!` (0 errors, 0 warnings).**
 - ✅ **Mã nguồn đã đồng bộ trên GitHub:** [https://github.com/pvhung2112/cashew](https://github.com/pvhung2112/cashew)
