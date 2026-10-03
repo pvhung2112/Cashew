@@ -1,3 +1,4 @@
+import 'package:budget/pages/studyDocumentsPage.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/main.dart';
 import 'package:budget/pages/editCategoriesPage.dart';
@@ -314,6 +315,14 @@ class NavigationSidebarState extends State<NavigationSidebar> {
                               NavigationSidebarButtonWithNavBarIconData(
                                 navBarIconDataKey: "about",
                                 currentPageIndex: selectedIndex,
+                              ),
+                              NavigationSidebarButton(
+                                icon: Icons.menu_book_rounded,
+                                label: "Tài liệu học tập",
+                                isSelected: false,
+                                onTap: () {
+                                  pushRoute(context, const StudyDocumentsPage());
+                                },
                               ),
                               SyncButton(),
                               SizedBox(height: 10),
